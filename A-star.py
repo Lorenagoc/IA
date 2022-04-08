@@ -1,3 +1,15 @@
+'''
+Primeira lista de exercício do laboratório de Inteligência Artificial 2022.1
+
+Tema: Busca A*, problema do caminho de Arad até Bucareste
+
+Referências bibliográficas: 
+-> https://www.pythonpool.com/a-star-algorithm-python/
+-> https://stackabuse.com/basic-ai-concepts-a-search-algorithm/
+-> https://www.youtube.com/watch?v=UwtjG1BUHJA
+-> https://www.youtube.com/watch?v=__DGIVPIE9U
+
+'''
 from collections import deque
 
 
