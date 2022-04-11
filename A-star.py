@@ -8,23 +8,23 @@ Referências bibliográficas:
 -> https://stackabuse.com/basic-ai-concepts-a-search-algorithm/
 -> https://www.youtube.com/watch?v=UwtjG1BUHJA
 -> https://www.youtube.com/watch?v=__DGIVPIE9U
-
 '''
+
 from collections import deque
 
 
 class Grafo:
 
     # Cria o objeto grafo que possui vizinhos como atributos
-    def __init__(self, vertices) -> None:
-        self.vertices = vertices
+    def __init__(self, grafo) -> None:
+        self.grafo = grafo
 
     # Método para retornar os vizinhos do nó
-    def obtem_vizinhos(self, node):
-        return self.vertices[node]
+    def obtem_vizinhos(self, vertice):
+        return self.grafo[vertice]
 
     # Tabela de heurísticas das cidades
-    def h(self, node):
+    def h(self, vertice):
         H = {
             'Arad': 366,
             'Bucareste': 0,
@@ -48,7 +48,7 @@ class Grafo:
             'Zerind': 374
         }
 
-        return H[node]
+        return H[vertice]
 
     # Implementação do algoritm A* sendo f(n) = g(n) + h(n)
     def a_star(self, origem, destino):
@@ -61,61 +61,76 @@ class Grafo:
         g = {}  # Custo do caminho do nó inicial até o nó n
         g[origem] = 0
 
-        visitados = {}  # Mapa de vizinhos visitados
-        visitados[origem] = origem
+        adjacentes = {}  # Mapa de vizinhos visitados
+        adjacentes[origem] = origem
 
         # Enquanto ainda houver nós abertos com vizinhos não visitados...
         while len(lista_abertos) > 0:
 
             n = None  # Nó com menor f(n) até o momento
 
-            # Calcula menor custo do caminho total estimado
-            for vertice_atual in lista_abertos:
-                if n == None or g[vertice_atual] + self.h(vertice_atual) < g[n] + self.h(n):
-                    n = vertice_atual
+            # Calcula menor f(n)
+            for proximo_vertice in lista_abertos:
+                if n == None or g[proximo_vertice] + self.h(proximo_vertice) < g[n] + self.h(n):
+                    n = proximo_vertice  # Atualiza cidade atual
 
             if n == None:
                 print('O caminho não existe')
                 return None
 
-            # Se chegamos na cidade destino então percorre o caminho de volta
+            print(
+                "***** Estamos em {}, f(n) = {} *****".format(n, g[n] + self.h(n)))
+            print("")
+
+            # Verifica se chegou na cidade destino e percorre o caminho de volta
             if n == destino:
                 caminho = []
 
                 # Enquanto o nó houver vértices já visitados
-                while visitados[n] != n:
+                while adjacentes[n] != n:
                     # Adiciona no array todos os nós que foram abertos e verificados
                     caminho.append(n)
-                    n = visitados[n]  # Passa para o próximo
+                    n = adjacentes[n]  # Passa para o próximo
 
                 caminho.append(origem)  # Terminando, adiciona o nó de origem
-                caminho.reverse()  # Inverte todo o array
+                caminho.reverse()  # Inverte todo o array para imprimir o caminho na ordem
 
                 print('Melhor caminho: {}'.format(caminho))
                 return caminho
 
             # Para todos os vizinhos do nó atual
-            for(vizinho, h_vizinho) in self.obtem_vizinhos(n):
-                # Se o vertice ainda não foi aberto nem teve seus vizinhos inspecionados
-                if vizinho not in lista_abertos and vizinho not in lista_fechados:
-                    lista_abertos.add(vizinho)  # Adiciona na lista de abertos
-                    # Adiciona como um vértice visitado de n
-                    visitados[vizinho] = n
-                    # Calcula o custo do caminho até o vertice em questão
-                    g[vizinho] = g[n] + h_vizinho
-                # Se o vertice não foi aberto ou já foi aberto mas não inspecionado
+            for(v_adjacente, custo_aresta) in self.obtem_vizinhos(n):
+                # Se o vertice ainda não foi visitado
+                if v_adjacente not in lista_abertos and v_adjacente not in lista_fechados:
+                    # Adiciona na lista de abertos
+                    lista_abertos.add(v_adjacente)
+                    # Adiciona como um vértice de n
+                    adjacentes[v_adjacente] = n
+                    # Calcula custo da origem até o vertice em questão
+                    g[v_adjacente] = g[n] + custo_aresta
+
+                # Se o vertice já foi visitado
                 else:
-                    # Verifica se compensa seguir em frente
-                    if g[vizinho] > g[n] + h_vizinho:
+                    # Compara a possivel rota com o os caminhos já feitos anteriormente
+                    # Se não compensa, atualiza os dados
+                    if g[v_adjacente] > g[n] + custo_aresta:
                         # Atualiza o custo do vizinho (adiciona o valor acumulativo no lugar)
-                        g[vizinho] = g[n] + h_vizinho
+                        g[v_adjacente] = g[n] + custo_aresta
                         # Adiciona como um vértice visitado de n
-                        visitados[vizinho] = n
+                        adjacentes[v_adjacente] = n
 
-                        if vizinho in lista_fechados:
-                            lista_fechados.remove(vizinho)
-                            lista_abertos.add(vizinho)
+                        # Abre o vertice novamente para ser inspecionado por outras rotas
+                        if v_adjacente in lista_fechados:
+                            lista_fechados.remove(v_adjacente)
+                            lista_abertos.add(v_adjacente)
 
+            # Imprime as possíveis próximas cidades da rota
+            for v_aberto in lista_abertos:
+                print("Considerando ir para {}, f(n) = {}".format(
+                    v_aberto, g[v_aberto]+self.h(v_aberto)))
+            print()
+
+            # Todos os vizinhos foram visitados então fecha o nó
             lista_abertos.remove(n)
             lista_fechados.add(n)
 
