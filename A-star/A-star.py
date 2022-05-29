@@ -105,7 +105,7 @@ class Grafo:
                     # Adiciona como um vértice de n
                     adjacentes[v_adjacente] = n
                     # Calcula custo da origem até o vertice em questão
-                    g[v_adjacente] = g[n] + custo_aresta
+                    g[v_adjacente] = g[n] + custo_aresta + self.h(v_adjacente)
 
                 # Se o vertice já foi visitado
                 else:
