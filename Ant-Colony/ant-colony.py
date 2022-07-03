@@ -1,11 +1,7 @@
-from ast import Num
 import numpy as np
 import pandas as pd
 import math
 import random
-import math
-
-from pyparsing import null_debug_action
 
 '''
 Dupla: Lorena Gomes de Oliveira Cabral e Lucas Loscheider Reis Muniz
